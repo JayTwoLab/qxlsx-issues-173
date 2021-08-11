@@ -2616,10 +2616,22 @@ void WorksheetPrivate::loadXmlColumnsInfo(QXmlStreamReader &reader)
 
 void WorksheetPrivate::loadXmlMergeCells(QXmlStreamReader &reader)
 {
+    // issue #173 https://github.com/QtExcel/QXlsx/issues/173
+
 	Q_ASSERT(reader.name() == QLatin1String("mergeCells"));
 
 	QXmlStreamAttributes attributes = reader.attributes();
-	int count = attributes.value(QLatin1String("count")).toString().toInt();
+
+    bool isCount = attributes.hasAttribute(QLatin1String("count"));
+    int count = 0;
+    if ( !isCount )
+    {
+        qWarning("no count");
+    }
+    else
+    {
+        count = attributes.value(QLatin1String("count")).toString().toInt();
+    }
 
     while ( !reader.atEnd() &&
             !(reader.name() == QLatin1String("mergeCells") &&
@@ -2637,10 +2649,15 @@ void WorksheetPrivate::loadXmlMergeCells(QXmlStreamReader &reader)
 		}
 	}
 
-	if (merges.size() != count)
+    if (isCount)
     {
-        qWarning("read merge cells error");
+        int mergesSize = merges.size();
+        if ( mergesSize != count )
+        {
+            qWarning("read merge cells error");
+        }
     }
+
 }
 
 void WorksheetPrivate::loadXmlDataValidations(QXmlStreamReader &reader)

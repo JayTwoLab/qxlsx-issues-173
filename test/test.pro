@@ -18,3 +18,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include(../QXlsx/QXlsx.pri)
 
 SOURCES += main.cpp
+
+RESOURCES += test.qrc
